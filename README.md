@@ -1,2 +1,116 @@
 # -
 小爱心的实现
+<!DOCTYPE html>
+<html>
+<head>
+    <title>艳艳情人节快乐</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: url('https://images.unsplash.com/photo-1554080352-6b5be5e37bc3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            overflow: hidden;
+        }
+
+        #canvas {
+            margin-top: 20px;
+        }
+
+        .message {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3em;
+            color: #ff69b4;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            margin-top: 20px;
+            animation: fadeInUp 2s ease-out 5s forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <div class="message">艳艳 情人节快乐</div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // 自适应画布大小
+        function resizeCanvas() {
+            canvas.width = Math.min(window.innerWidth * 0.8, 600);
+            canvas.height = canvas.width;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // 爱心参数
+        const pixelSize = canvas.width / 30;
+        const heartShape = [];
+        
+        // 生成爱心形状数组
+        for (let y = -15; y <= 15; y++) {
+            for (let x = -15; x <= 15; x++) {
+                const equation = Math.pow(x/1.2, 2) + Math.pow(y, 2) - Math.pow(15/1.5, 2);
+                if (equation * equation * equation - Math.pow(x/1.2, 2) * Math.pow(y, 3) < 0) {
+                    heartShape.push({x: x + 15, y: y + 15});
+                }
+            }
+        }
+
+        // 渐变颜色生成器
+        function getColor(progress) {
+            const hue = 330 + progress * 10;
+            const saturation = 60 + progress * 40;
+            return `hsl(${hue}, ${saturation}%, 70%)`;
+        }
+
+        // 动画构建爱心
+        let current = 0;
+        const total = heartShape.length;
+        const duration = 5000; // 5秒
+        
+        function drawHeart() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const progress = current / total;
+            const alpha = progress * 0.8 + 0.2;
+            
+            heartShape.slice(0, current).forEach((pos, index) => {
+                ctx.fillStyle = getColor(index/total);
+                ctx.globalAlpha = alpha;
+                ctx.fillRect(
+                    pos.x * pixelSize, 
+                    pos.y * pixelSize, 
+                    pixelSize - 1, 
+                    pixelSize - 1
+                );
+            });
+
+            if (current < total) {
+                current += Math.ceil(total / (duration / 16));
+                requestAnimationFrame(drawHeart);
+            }
+        }
+
+        // 开始动画
+        setTimeout(drawHeart, 500);
+    </script>
+</body>
+</html>
